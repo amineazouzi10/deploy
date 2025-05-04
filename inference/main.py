@@ -3,10 +3,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 app = FastAPI()
 # 1) Charger tokenizer et base model directement depuis HF Hub (sans l’avoir en local)
-tokenizer = AutoTokenizer.from_pretrained("mistral‑7b‑instruct‑v0.2")
 quant_config = BitsAndBytesConfig(load_in_8bit=True)  # ou config de quantification que vous souhaitez
+BASE = "mistralai/Mistral-7B-Instruct-v0.2"
+# pas besoin d'appel explicite à `login()` si HF_HUB_TOKEN est défini
+tokenizer = AutoTokenizer.from_pretrained(BASE)
 model = AutoModelForCausalLM.from_pretrained(
-    "mistral‑7b‑instruct‑v0.2",
+    BASE,
+    use_auth_token=True,       # parfois nécessaire selon version
     quantization_config=quant_config,
     device_map="auto"
 )
