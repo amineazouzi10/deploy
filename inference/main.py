@@ -1,21 +1,27 @@
 from fastapi import FastAPI, Body
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import os
 
 app = FastAPI()
-# 1) Charger tokenizer et base model directement depuis HF Hub (sans l'avoir en local)
-quant_config = BitsAndBytesConfig(load_in_8bit=True)  # ou config de quantification que vous souhaitez
-BASE = "mistralai/Mistral-7B-Instruct-v0.2"  # Corrected model path with proper hyphens
-# pas besoin d'appel explicite à `login()` si HF_HUB_TOKEN est défini
-tokenizer = AutoTokenizer.from_pretrained(BASE)
+
+# 1) Load tokenizer and base model directly from HF Hub
+quant_config = BitsAndBytesConfig(load_in_8bit=True)
+BASE = "mistralai/Mistral-7B-Instruct-v0.2"  # Corrected model path with proper ASCII hyphens
+
+# Get HF token from environment if set
+hf_token = os.environ.get("HF_HUB_TOKEN", None)
+
+# Initialize tokenizer and model
+tokenizer = AutoTokenizer.from_pretrained(BASE, token=hf_token)
 model = AutoModelForCausalLM.from_pretrained(
     BASE,
-    use_auth_token=True,       # parfois nécessaire selon version
+    token=hf_token,
     quantization_config=quant_config,
     device_map="auto"
 )
-# 2) Charger votre adapter depuis GCS
-#     il faut que gcsfuse ou storage client soit dispo ; ici on monte le bucket dans /mnt/adapters
-model.load_adapter("/mnt/adapter", config="pfeiffer", load_as="mistral_adapter")  # Updated path to match volume mount
+
+# 2) Load your adapter from GCS mount
+model.load_adapter("/mnt/adapter", config="pfeiffer", load_as="mistral_adapter")
 model.set_adapter("mistral_adapter")
 
 @app.post("/generate")
