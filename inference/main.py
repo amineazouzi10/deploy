@@ -8,6 +8,8 @@ app = FastAPI()
 quant_config = BitsAndBytesConfig(load_in_8bit=True)
 BASE = "mistralai/Mistral-7B-Instruct-v0.2"  # Corrected model path with proper ASCII hyphens
 
+#mistralai/Mistral-7B-Instruct-v0.2
+
 # Get HF token from environment if set
 hf_token = os.environ.get("HF_HUB_TOKEN", None)
 
