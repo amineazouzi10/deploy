@@ -21,14 +21,14 @@ quant_config = BitsAndBytesConfig(load_in_8bit=True)
 tokenizer = None
 model = None
 
-
+HF_HUB_TOKEN = "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"
 @app.on_event("startup")
 async def startup_event():
     """Charge le modèle et le tokenizer au démarrage de l'application."""
     global tokenizer, model
 
     # Obtenir le token HF de l'environnement si défini
-    hf_token = os.environ.get("HF_HUB_TOKEN")
+    hf_token = HF_HUB_TOKEN
 
     try:
         start_time = time.time()
