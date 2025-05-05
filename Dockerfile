@@ -20,13 +20,18 @@ ENV TRANSFORMERS_CACHE=/app/model_cache
 ENV HF_HOME=/app/model_cache
 
 # Pré-téléchargement du modèle et du tokenizer
-# Note: Dans un build réel, remplacez ARG HF_TOKEN par le token dans Secret Manager
+# Note: Le token doit être passé lors du build avec --build-arg HF_TOKEN=your_token
 ARG HF_TOKEN
-ENV HF_TOKEN=${HF_TOKEN}
+# Vérifions que le token n'est pas vide
+RUN if [ -z "$HF_TOKEN" ]; then echo "HF_TOKEN is required. Use --build-arg HF_TOKEN=your_token"; exit 1; fi
+
+# Utilisons le token directement dans le script Python pour éviter les problèmes d'interpolation
 RUN python -c "from huggingface_hub import snapshot_download; \
-    snapshot_download('mistralai/Mistral-7B-Instruct-v0.2', \
-    cache_dir='/app/model_cache', \
-    token='${HF_TOKEN}')"
+    snapshot_download( \
+        repo_id='mistralai/Mistral-7B-Instruct-v0.2', \
+        cache_dir='/app/model_cache', \
+        token='$HF_TOKEN' \
+    )"
 
 # Image finale
 FROM python:3.10-slim
