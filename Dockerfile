@@ -10,7 +10,7 @@ RUN mkdir -p /app/model_cache
 WORKDIR /app
 
 # Copier les fichiers d'application
-COPY *.py /app/
+COPY inference/*.py /app/
 
 # Installer les dépendances Python
 RUN pip install --no-cache-dir \
@@ -22,8 +22,7 @@ RUN pip install --no-cache-dir \
     accelerate \
     peft \
     sentencepiece \
-    spacy \
-    re
+    spacy
 
 # Téléchargement du modèle spaCy français
 RUN python -m spacy download fr_core_news_sm
