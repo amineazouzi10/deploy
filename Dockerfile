@@ -12,10 +12,14 @@ WORKDIR /app
 # Copier les fichiers d'application
 COPY inference/*.py /app/
 
-# Installer les dépendances Python
+# Installer les dépendances Python - installation de torch séparément
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# Installer les autres dépendances
 RUN pip install --no-cache-dir \
-    fastapi uvicorn torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu \
-    transformers==4.35.2 \
+    fastapi \
+    uvicorn \
+    transformers \
     google-cloud-storage \
     huggingface_hub \
     safetensors \
